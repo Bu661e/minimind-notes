@@ -301,8 +301,8 @@ head_dim = 64         # 每个头 64 维
 - [Attention? Attention!](https://lilianweng.github.io/posts/2018-06-24-attention/)
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:250-330` - Attention 实现
-- MiniMind: `model/model_minimind.py:180-210` - GQA 实现
+- MiniMind: `reference/model/model_minimind.py:250-330` - Attention 实现
+- MiniMind: `reference/model/model_minimind.py:180-210` - GQA 实现
 
 ### 自测题
 - 📝 [quiz.md](./quiz.md) - 完成自测题巩固理解

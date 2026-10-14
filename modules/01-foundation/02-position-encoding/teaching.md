@@ -306,8 +306,8 @@ def forward(self, x, pos_ids):
 - [The Illustrated RoPE](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:108-200` - RoPE 实现
-- MiniMind: `model/model_minimind.py:250-330` - Attention 中的使用
+- MiniMind: `reference/model/model_minimind.py:108-200` - RoPE 实现
+- MiniMind: `reference/model/model_minimind.py:250-330` - Attention 中的使用
 
 ### 自测题
 - 📝 [quiz.md](./quiz.md) - 完成自测题巩固理解

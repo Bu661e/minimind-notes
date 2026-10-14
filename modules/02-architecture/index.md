@@ -178,8 +178,8 @@ class TransformerDecoder(nn.Module):
 - [On Layer Normalization in the Transformer Architecture](https://arxiv.org/abs/2002.04745) - Pre-LN vs Post-LN
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:359-380`（TransformerBlock）
-- MiniMind: `model/model_minimind.py:430-520`（完整模型）
+- MiniMind: `reference/model/model_minimind.py:359-380`（TransformerBlock）
+- MiniMind: `reference/model/model_minimind.py:430-520`（完整模型）
 
 ### 可视化工具
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)

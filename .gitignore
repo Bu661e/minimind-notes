@@ -36,6 +36,10 @@ Thumbs.db
 # Backup
 .git.backup/
 
+# 实验数据与产物（体积大，可重新下载/生成）
+modules/common/data/
+modules/**/experiments/results/
+
 # VitePress
 node_modules/
 .vitepress/dist/

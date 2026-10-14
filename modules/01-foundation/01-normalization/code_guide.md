@@ -14,7 +14,7 @@ keywords: RMSNorm代码, LayerNorm实现, 归一化源码, Pre-LN代码, Post-LN
 
 ### 1. RMSNorm 类定义
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：95-105
 
 ```python
@@ -36,7 +36,7 @@ class RMSNorm(torch.nn.Module):
 
 ### 2. RMSNorm 在 TransformerBlock 中的使用
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：359-380
 
 ```python
@@ -321,13 +321,13 @@ x.pow(2).mean(-1)                # [batch, seq]
 
 ### MiniMind 仓库中的其他相关文件
 
-1. **配置文件**：`model/model_minimind.py:30-65`
+1. **配置文件**：`reference/model/model_minimind.py:30-65`
    - `MiniMindConfig` 中的 `rms_norm_eps` 参数
 
-2. **模型初始化**：`model/model_minimind.py:430-520`
+2. **模型初始化**：`reference/model/model_minimind.py:430-520`
    - `MiniMindForCausalLM` 中创建所有 TransformerBlock
 
-3. **训练脚本**：`trainer/train_pretrain.py`
+3. **训练脚本**：`reference/trainer/train_pretrain.py`
    - 如何设置模型配置
 
 4. **测试脚本**：`eval_llm.py`
@@ -353,6 +353,6 @@ x.pow(2).mean(-1)                # [batch, seq]
 
 ## 📚 延伸阅读
 
-- MiniMind 完整代码：`model/model_minimind.py`
+- MiniMind 完整代码：`reference/model/model_minimind.py`
 - Llama 2 源码：[facebookresearch/llama](https://github.com/facebookresearch/llama)
 - PyTorch LayerNorm 源码：[torch.nn.LayerNorm](https://pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html)

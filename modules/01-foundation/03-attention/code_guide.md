@@ -14,7 +14,7 @@ keywords: Attention代码, 注意力机制实现, QKV源码, 多头注意力代�
 
 ### 1. Attention 类
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：250-330
 
 ```python
@@ -200,6 +200,6 @@ plt.imshow(attn_weights[0, 0].detach().numpy())
 
 ## 📚 延伸阅读
 
-- MiniMind 完整代码：`model/model_minimind.py`
+- MiniMind 完整代码：`reference/model/model_minimind.py`
 - Flash Attention 论文：[arXiv:2205.14135](https://arxiv.org/abs/2205.14135)
 - PyTorch SDPA：[scaled_dot_product_attention](https://pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html)

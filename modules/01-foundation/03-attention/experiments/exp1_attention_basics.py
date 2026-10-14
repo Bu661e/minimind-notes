@@ -166,7 +166,10 @@ Attention 如何解决这个问题？
     for name, vec in zip(word_names, words):
         print(f"  {name:6s}: {vec.numpy()}")
 
-    # TODO(human)
+    # 计算注意力（同实验 2 的简化假设：Q = K = V = words）
+    Q = K = V = words                                   # 实际中三者来自不同的线性投影
+    scores = Q @ K.T                                    # [3, 3] 两两相似度
+    attention_weights = F.softmax(scores, dim=-1)       # 沿最后一维归一化为权重
 
     print("\n" + "="*70)
     print("观察:")

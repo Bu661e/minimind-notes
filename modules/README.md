@@ -71,7 +71,7 @@ _（后续扩展）_
 pip install torch requests datasets matplotlib numpy
 ```
 
-详见：[快速开始指南](/docs/guide/quick-start)
+详见：[快速开始指南](../HOW_TO_LEARN.md)
 
 ---
 
@@ -93,7 +93,7 @@ cd modules/common
 python data_sources.py --download-all
 ```
 
-> 详细环境配置说明请参考 [README.md](../README.md#-快速开始)
+> 详细环境配置说明请参考 [HOWTOLEARN.md](../HOW_TO_LEARN.md)
 
 ### 30 分钟快速体验
 
@@ -285,7 +285,5 @@ python data_sources.py --download-all
 
 ## 📞 相关文档
 
-- 📝 [个人学习日志](../learning_log.md)
-- 📚 [知识库](../knowledge_base.md)
-- 🗺️ [学习路线图](../ROADMAP.md)
-- 🏠 [项目主页](../README.md)
+- 📝 [学习笔记](../notes.md)
+- 📖 [学习指引](../HOW_TO_LEARN.md)

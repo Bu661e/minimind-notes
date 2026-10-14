@@ -292,7 +292,7 @@ class FeedForward(nn.Module):
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/) - 可视化理解 FFN
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:330-380` - FeedForward 实现
+- MiniMind: `reference/model/model_minimind.py:330-380` - FeedForward 实现
 
 ### 自测题
 - 📝 [quiz.md](./quiz.md) - 完成自测题巩固理解

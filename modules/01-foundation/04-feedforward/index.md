@@ -148,7 +148,7 @@ x → RMSNorm → Attention → + → RMSNorm → FeedForward → +
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762) - 原始 FFN
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:330-380`
+- MiniMind: `reference/model/model_minimind.py:330-380`
 
 ---
 

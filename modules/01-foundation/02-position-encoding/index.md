@@ -120,7 +120,7 @@ python exp2_rope_basics.py --quick
 - [RoFormer: Enhanced Transformer with Rotary Position Embedding](https://arxiv.org/abs/2104.09864)
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:108-200`
+- MiniMind: `reference/model/model_minimind.py:108-200`
 
 ---
 

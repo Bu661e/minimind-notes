@@ -14,7 +14,7 @@ keywords: RoPE代码, 位置编码实现, 旋转位置编码源码, Transformer�
 
 ### 1. 预计算旋转频率
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：108-128
 
 ```python
@@ -44,7 +44,7 @@ def precompute_freqs_cis(dim: int, end: int, rope_base: float = 1e6, rope_scalin
 
 ### 2. 应用旋转编码
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：131-145
 
 ```python
@@ -70,7 +70,7 @@ def apply_rotary_emb(xq: torch.Tensor, xk: torch.Tensor, freqs_cis: torch.Tensor
 
 ### 3. 在 Attention 中使用
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：250-290
 
 ```python
@@ -287,14 +287,14 @@ assert torch.allclose(score_5_8, score_100_103)
 
 ## 🔗 相关代码位置
 
-1. **配置参数**：`model/model_minimind.py:30-65`
+1. **配置参数**：`reference/model/model_minimind.py:30-65`
    - `rope_theta`：基础频率（默认 1e6）
    - `max_position_embeddings`：最大序列长度
 
-2. **YaRN 支持**：`model/model_minimind.py:120-125`
+2. **YaRN 支持**：`reference/model/model_minimind.py:120-125`
    - `inference_rope_scaling`：长度外推系数
 
-3. **完整 Attention**：`model/model_minimind.py:250-330`
+3. **完整 Attention**：`reference/model/model_minimind.py:250-330`
    - 包含 GQA（Grouped Query Attention）
 
 ---
@@ -326,6 +326,6 @@ plt.show()
 
 ## 📚 延伸阅读
 
-- MiniMind 完整代码：`model/model_minimind.py`
+- MiniMind 完整代码：`reference/model/model_minimind.py`
 - Llama 2 源码：[facebookresearch/llama](https://github.com/facebookresearch/llama)
 - RoFormer 论文：[arXiv:2104.09864](https://arxiv.org/abs/2104.09864)

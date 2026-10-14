@@ -138,7 +138,7 @@ $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, ..., \text{head}_h) W
 - [GQA: Training Generalized Multi-Query Transformer](https://arxiv.org/abs/2305.13245)
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:250-330`
+- MiniMind: `reference/model/model_minimind.py:250-330`
 
 ---
 

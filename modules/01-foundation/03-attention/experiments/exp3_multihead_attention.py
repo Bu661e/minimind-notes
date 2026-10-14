@@ -52,7 +52,15 @@ class SimplifiedAttention(nn.Module):
         batch_size, seq_len, _ = x.shape
 
         # 步骤 1: 投影到 Q, K, V
-        # TODO(human)
+        # 线性投影后 reshape 成多头形状 [batch, heads, seq, head_dim]
+        # 注意 K/V 的头数比 Q 少（GQA），这里 num_kv_heads=2 < num_heads=4
+        xq = self.q_proj(x).view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
+        xk = self.k_proj(x).view(batch_size, seq_len, self.num_kv_heads, self.head_dim).transpose(1, 2)
+        xv = self.v_proj(x).view(batch_size, seq_len, self.num_kv_heads, self.head_dim).transpose(1, 2)
+
+        # GQA：把 K/V 的头重复 n_rep 次，使其数量与 Q 对齐后再计算
+        xk = xk.repeat_interleave(self.n_rep, dim=1)
+        xv = xv.repeat_interleave(self.n_rep, dim=1)
 
         print(f"\n" + "="*60)
         print("📊 Attention 计算流程")

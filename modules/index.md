@@ -71,7 +71,7 @@ _（后续扩展）_
 pip install torch requests datasets matplotlib numpy
 ```
 
-详见：[快速开始指南](/docs/guide/quick-start)
+详见：[快速开始指南](../HOW_TO_LEARN.md)
 
 ---
 
@@ -257,7 +257,5 @@ from modules.common.visualization import (
 
 ## 📞 相关文档
 
-- 📝 [个人学习日志](../learning_log.md)
-- 📚 [知识库](../knowledge_base.md)
-- 🗺️ [学习路线图](../ROADMAP.md)
-- 🏠 [项目主页](../README.md)
+- 📝 [学习笔记](../notes.md)
+- 📖 [学习指引](../HOW_TO_LEARN.md)

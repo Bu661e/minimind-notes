@@ -14,7 +14,7 @@ keywords: FeedForward代码, 前馈网络实现, FFN源码, SwiGLU代码, Transf
 
 ### 1. FeedForward 类
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：330-380
 
 ```python
@@ -42,7 +42,7 @@ class FeedForward(nn.Module):
 
 ### 2. 在 TransformerBlock 中的使用
 
-**文件**：`model/model_minimind.py`
+**文件**：`reference/model/model_minimind.py`
 **行数**：400-450
 
 ```python
@@ -316,15 +316,15 @@ plt.show()
 
 ## 🔗 相关代码位置
 
-1. **配置参数**：`model/model_minimind.py:30-65`
+1. **配置参数**：`reference/model/model_minimind.py:30-65`
    - `intermediate_size`：中间维度
    - `hidden_size`：隐藏维度
 
-2. **MoE FeedForward**：`model/model_minimind.py:380-450`
+2. **MoE FeedForward**：`reference/model/model_minimind.py:380-450`
    - 专家混合版本
    - 每个专家是一个 FeedForward
 
-3. **完整 TransformerBlock**：`model/model_minimind.py:450-500`
+3. **完整 TransformerBlock**：`reference/model/model_minimind.py:450-500`
    - Attention + FFN 的组合
 
 ---
@@ -369,6 +369,6 @@ print(f"FLOPs: {flops/1e6:.2f}M, Params: {params/1e6:.2f}M")
 
 ## 📚 延伸阅读
 
-- MiniMind 完整代码：`model/model_minimind.py`
+- MiniMind 完整代码：`reference/model/model_minimind.py`
 - Llama 2 源码：[facebookresearch/llama](https://github.com/facebookresearch/llama)
 - GLU 论文：[arXiv:2002.05202](https://arxiv.org/abs/2002.05202)

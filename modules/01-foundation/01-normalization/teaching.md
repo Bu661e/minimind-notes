@@ -328,8 +328,8 @@ def forward(self, x):
 - [Why does normalization help?](https://blog.paperspace.com/busting-the-myths-about-batch-normalization/)
 
 ### 代码实现
-- MiniMind: `model/model_minimind.py:95-105` - RMSNorm 实现
-- MiniMind: `model/model_minimind.py:359-380` - TransformerBlock 中的使用
+- MiniMind: `reference/model/model_minimind.py:95-105` - RMSNorm 实现
+- MiniMind: `reference/model/model_minimind.py:359-380` - TransformerBlock 中的使用
 
 ### 自测题
 - 📝 [quiz.md](./quiz.md) - 完成 5 道选择题巩固理解

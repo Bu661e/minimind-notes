@@ -62,8 +62,8 @@ python exp2_norm_comparison.py --quick
 - 💻 [code_guide.md](./code_guide.md) - MiniMind 源码导读
 
 **关键文件**：
-- `model/model_minimind.py:95-105` - RMSNorm 实现
-- `model/model_minimind.py:359-380` - TransformerBlock 中的使用
+- `reference/model/model_minimind.py:95-105` - RMSNorm 实现
+- `reference/model/model_minimind.py:359-380` - TransformerBlock 中的使用
 
 ---
 
