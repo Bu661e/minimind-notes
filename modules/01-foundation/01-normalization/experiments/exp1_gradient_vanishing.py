@@ -49,7 +49,7 @@ def run_experiment():
 
     # 设置参数
     hidden_dim = 512
-    num_layers = 10
+    num_layers = 100
     torch.manual_seed(42)  # 可复现
 
     # 初始输入

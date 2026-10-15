@@ -2,16 +2,25 @@
 
 > 由 `llm-learning` skill 在对话中静默记录。
 
+## 目录
+
+- [1. 归一化](#1-归一化)
+  - [Q1. RMSNorm 和 LayerNorm 有什么区别？](#q1-rmsnorm-和-layernorm-有什么区别)
+  - [Q2. 标准差是什么？激活值标准差是什么？](#q2-标准差是什么激活值标准差是什么)
+
 ## 1. 归一化
 
 ### Q1. RMSNorm 和 LayerNorm 有什么区别？
 
-**A**：LayerNorm 减均值再除以标准差；RMSNorm 只按均方根缩放、不减均值，少一次求均值，也无 bias，效果接近而更快。Llama 系列与 MiniMind 都用它。
+**速览**：LayerNorm 减均值再除以标准差；RMSNorm 只按均方根缩放、不减均值，少一次求均值，也无 bias，效果接近而更快。
+
+**详解**：要理解 RMSNorm，先看它要解决什么。网络一层层叠下去，每层输出的数值尺度很容易跑偏——要么越来越大，一路放大到溢出；要么越来越小，缩到几乎为零。一旦尺度失控，反向传播的梯度也跟着爆炸或消失，训练就崩了。归一化就是每层之后把数值"拉回"一个稳定的尺度，让后面那层面对的输入始终规规矩矩。LayerNorm 的做法是把每个向量先减去自己的均值（让它以 0 为中心），再除以自己的标准差（把尺度拉成 1），最后用一个可学习参数 $\gamma$ 缩放、$\beta$ 平移，把"标准化"这件事的权力交还给模型——如果模型觉得不归一化更好，它可以把 $\gamma$ 学成原来的标准差、$\beta$ 学成原来的均值，把归一化原样抵消掉。RMSNorm 的洞察是：减均值这一步其实没那么重要。它发现真正决定尺度稳定的是分母那个"大小"，而平移（减去均值、再加回 $\beta$）对最终效果的贡献很小，却要付出两次额外的逐元素运算。于是它干脆只保留"除"的那部分：不算均值，只算平方平均，开根号得到均方根（Root Mean Square，RMS），拿它当分母，再乘 $\gamma$。少了一次求均值、一次减法、一次加法，也就少了两三个 kernel 的启动和一轮显存读写。规模小的时候这两种看不出差别，但大模型每一层都要做、每个 token 都要做，省下的算力累积起来很可观——Llama 系列和 MiniMind 都因此选了它。代价是表达能力略弱一点，因为不再能把激活的均值挪到 0，但实测效果几乎无损，这就是典型的"用一点点精度换一大块速度"。
 
 **公式**
 
 $$
-\text{RMSNorm}(x) = \frac{x}{\sqrt{\frac{1}{n}\sum_{i=1}^{n} x_i^2 + \epsilon}} \odot \gamma
+\text{RMSNorm}(x) = \frac{x}{\sqrt{\frac{1}{d}\sum_{i=1}^{d} x_i^2 + \epsilon}} \odot \gamma,
+\qquad d = \text{dim\_model}
 $$
 
 **PyTorch 调用**
@@ -19,19 +28,62 @@ $$
 ```python
 import torch.nn as nn
 
-norm = nn.RMSNorm(512)          # PyTorch ≥ 2.4
-y = norm(x)
+norm = nn.RMSNorm(normalized_shape=512,     # 要归一化的最后一维大小，须等于 x.shape[-1] = dim_model
+                  eps=1e-6,                 # 防除零的小常数，加在均方根内部
+                  elementwise_affine=True)  # 是否带可学习缩放参数 γ # γ: [dim_model] 即 [512]
+y = norm(x)                                 # x: [batch_size, seq_len, dim_model] → y 同形，形状不变
 ```
 
 **从 tensor 手写**
 
 ```python
-def rms_norm(x, gamma, eps=1e-6):
-    # x: (..., n)
-    x = x * torch.rsqrt(
-            x.pow(2) # a.pow(b) = a ** b
-            .mean(dim=-1, keepdim=True)  # mean = 按照维度求均值，keepdim=True 保持维度不变
-            + eps # 1e-6 防止除零
-        )
-    return x * gamma            # 逐元素缩放
+def rms_norm(x, gamma, eps=1e-6):   # x: [batch_size, seq_len, dim_model] 待归一化 | gamma: [dim_model] 缩放参数 | eps: 防除零常数
+    sq = x.pow(2)                        # a.pow(b) = a ** b # sq: [batch_size, seq_len, dim_model] 逐元素平方，形状不变
+    ms = sq.mean(dim=-1, keepdim=True)   # dim=-1 沿最后一维求均值 # ms: [batch_size, seq_len, 1] keepdim=True 保留该维，便于后面广播
+    rms = torch.sqrt(ms + eps)           # +eps 防止除零 # rms: [batch_size, seq_len, 1] 均方根
+    x_n = x / rms                        # 广播相除，完成归一化 # x_n: [batch_size, seq_len, dim_model]
+    return x_n * gamma                   # 逐特征缩放 # 返回: [batch_size, seq_len, dim_model]
+
+# 调用：定义完必须实际跑一遍，造一组具体数据
+batch_size, seq_len, dim_model = 2, 4, 512   # 批大小=2, 序列长=4, 隐藏维=512
+x     = torch.randn(batch_size, seq_len, dim_model)   # x: [2, 4, 512] 输入张量
+gamma = torch.ones(dim_model)                         # gamma: [512] 缩放参数，初始化为全 1
+y     = rms_norm(x, gamma)                            # 位置传参 (x, gamma)，eps 走默认值
+print(y.shape)                                        # torch.Size([2, 4, 512]) 输出同形
+```
+
+### Q2. 标准差是什么？激活值标准差是什么？
+
+**速览**：标准差是"一组数离平均值有多散"的度量，数学上就是方差开根号。激活值标准差是把某个网络层输出的所有数值当成一组数来算标准差，它衡量这层数值的**整体尺度**；数值太高说明信号在放大、会梯度爆炸，太低说明信号在衰减、会梯度消失，理想情况是每一层都稳定在 1.0 附近。
+
+**详解**：先从最朴素的直觉说起。假设一个班的考试成绩，平均分 70 分。这个"70"只告诉你大家考得怎么样，没告诉你**差距大不大**——如果全班都在 68~72 之间，那是齐头并进；如果有考 100 的也有考 30 的，那平均分同样是 70，但完全是两回事。要知道"散不散"，就得看每个分数离平均分多远，把这些距离综合起来。标准差干的就是这件事：先算每个数减去均值的差（偏差），把偏差平方（这样正负不会互相抵消，而且大偏差被放大），求平均得到方差，最后开根号还原回原来的量纲——毕竟平方过的东西单位是"分²"，开方后才和原始分数可比。
+
+$$
+\sigma = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(x_i - \mu)^2},
+\qquad \mu = \frac{1}{n}\sum_{i=1}^{n} x_i
+$$
+
+放到神经网络里，"一组数"就是一层的输出张量里所有的数值。所谓**激活值**（activation），指的是某一层做完运算之后、传给它后面那一层的那个张量；之所以叫"激活"，是因为早期网络习惯接 sigmoid 之类的激活函数，现在虽然常是 ReLU 或干脆是线性层输出，名字沿用了下来。那么"激活值标准差"就是：把这一层输出张量的所有元素摊平成一串数，算它们的标准差。它描述的是**这层数值的整体尺度有多大**——std 大意味着数值分布得开、量级大；std 小意味着所有数值都挤在均值附近、量级小。
+
+为什么这个数值得盯着看？因为网络是一层套一层的。第一层的输出是第二层的输入，第二层的输出又是第三层的输入。如果每一层都把标准差放大 1.2 倍，10 层之后就是 $1.2^{10} \approx 6.2$ 倍；如果每层缩小到 0.8 倍，10 层后只剩 $0.8^{10} \approx 0.107$，也就是 1/10 都不到——这就是 [exp1_gradient_vanishing.py](modules/01-foundation/01-normalization/experiments/exp1_gradient_vanishing.py) 里看到的衰减。乘性衰减的可怕之处在于它是**指数级**的：20 层、50 层下去，数值会直接缩到浮点数表示不出来，或者胀到溢出。而且这不只是前向的问题——反向传播时，梯度要沿着同样的路径乘回去，前向缩了 10 倍，回传的梯度也缩了差不多 10 倍，前面几层的参数就几乎收不到有效的更新信号，学不动了。反过来 std 一直涨，梯度就会越来越大，训练一步跳到天上去（loss 变 NaN）。
+
+所以**理想情况是每一层的激活标准差都稳定在 1.0 附近，并且十层二十层叠下去都不漂移**。这也是归一化层存在的全部理由：它插在每层输出之后，硬性把这一层的 std 按回到 1.0，再交给下一层。注意"稳定在 1.0"不等于"必须是 1.0"——归一化后面的 $\gamma$ 是可学习的，如果模型觉得某个特征该大一点，它会把 $\gamma$ 学成 2.0，那时该层 std 就会是 2.0。关键是这个尺度由**模型主动学习决定**，而不是被逐层连乘的随机性被动带偏。另外要看的是**逐层曲线的形状**：理想的曲线是一条贴着 1.0 的水平线，糟糕的曲线是斜率稳定向下的斜线（衰减）或向上的斜线（爆炸）。
+
+顺带说一个容易混淆的点：这里的 std 是**跨所有元素**算的一个标量（比如 [100, 512] 的张量 → 一个数），而 RMSNorm/LayerNorm 内部算的是**沿最后一维**（每个 token 向量各算各的）。两者含义不同：前者是给你观察诊断用的全局指标，后者是真正参与归一化运算的。
+
+**公式**
+
+$$
+\sigma = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(x_i - \mu)^2}
+$$
+
+**PyTorch 调用**
+
+```python
+import torch
+
+x = torch.randn(100, 512) * 3      # x: [batch_size, dim_model] 造一组尺度为 3 的激活值
+x.std()                            # 全局标准差（所有元素一起算），因无 dim 参数而对整个张量求
+x.std(dim=-1, keepdim=True)        # 沿最后一维求，dim=-1 即对每个样本的 512 个特征算一个 std；keepdim=True 保持维度，使结果可广播回原形
+x.std(dim=-1, keepdim=True, unbiased=False)   # unbiased=False 计算总体标准差（除以 n 而非 n-1），归一化实现里用的是这个
 ```
